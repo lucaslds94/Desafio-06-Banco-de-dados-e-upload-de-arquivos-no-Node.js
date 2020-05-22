@@ -35,9 +35,11 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      const response = await api.get('/transactions');
+      const {
+        data: { transactions, balance },
+      } = await api.get('/transactions');
 
-      const formattedTransactions = response.data.transactions.map(
+      const formattedTransactions = transactions.map(
         (transaction: Transaction) => ({
           ...transaction,
           formattedValue: formatValue(transaction.value),
@@ -48,9 +50,9 @@ const Dashboard: React.FC = () => {
       );
 
       const formattedBalance = {
-        income: formatValue(response.data.balance.income),
-        outcome: formatValue(response.data.balance.outcome),
-        total: formatValue(response.data.balance.total),
+        income: formatValue(balance.income),
+        outcome: formatValue(balance.outcome),
+        total: formatValue(balance.total),
       };
 
       setTransactions(formattedTransactions);
@@ -101,17 +103,15 @@ const Dashboard: React.FC = () => {
 
             <tbody>
               {transactions.map(transaction => (
-                <>
-                  <tr>
-                    <td className="title">{transaction.title}</td>
-                    <td className={transaction.type}>
-                      {transaction.type === 'outcome' && ' - '}
-                      {transaction.formattedValue}
-                      </td>
-                    <td>{transaction.category.title}</td>
-                    <td>{transaction.formattedDate}</td>
-                  </tr>
-                </>
+                <tr key={transaction.id}>
+                  <td className="title">{transaction.title}</td>
+                  <td className={transaction.type}>
+                    {transaction.type === 'outcome' && ' - '}
+                    {transaction.formattedValue}
+                  </td>
+                  <td>{transaction.category.title}</td>
+                  <td>{transaction.formattedDate}</td>
+                </tr>
               ))}
             </tbody>
           </table>
